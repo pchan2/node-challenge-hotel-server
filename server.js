@@ -66,19 +66,25 @@ app.get("/bookings/:id", function (request, response) {
 
 // DELETE A BOOKING BY ID
 app.delete("/bookings/:id", function (request, response) {
-  const {id} = request.params;
+  
+  const deleteId = request.params.id;
+  if(isNaN(deleteId)) {
+    return response.send(400, {
+      message: "Please include a numeric ID inside the route"
+    })
+  }
 
-  id > bookings.length || !id ? response.sendStatus(404) : (bookings = bookings.filter(item => item.id != id), response.send(bookings));
-  // bookings.forEach(booking => {
-  //   if(booking.id == id) {
-  //     let idIndex = bookings.indexOf(id);
-  //     console.log(idIndex);
-  //     bookings.splice(idIndex, 1);
-  //     response.json("Booking ID " + id + " deleted");
-  //   } else {
-  //     response.status(404).json("Booking ID " + id + " not found");
-  //   }
-  // })
+  let index = bookings.findIndex(booking => booking.id == deleteId);
+  if(index < 0) {
+    return response.send(404, {
+      message: "ID not found, please try again"
+    })
+  }
+
+  bookings.splice(index, 1);
+  return response.json(bookings);
+
+  // !bookings.id ? response.sendStatus(404) : (bookings = bookings.filter(item => item.id != id), response.send(bookings));
 });
 
 const listener = app.listen(process.env.PORT || 3000, function () {
